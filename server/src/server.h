@@ -8,5 +8,6 @@
 #include "utils.h"
 
 void iterator(char* value);
+void recibirConexion(int cliente_fd);
 
 #endif /* SERVER_H_ */

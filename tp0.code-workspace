@@ -8,7 +8,8 @@
 	},
 	"folders": [
 		{
-			"path": "client"
+			"path": "client",
+			"path": "client2" 
 		},
 		{
 			"path": "server"

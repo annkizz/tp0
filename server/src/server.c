@@ -7,6 +7,20 @@ int main(void) {
 	log_info(logger, "Servidor listo para recibir al cliente");
 	int cliente_fd = esperar_cliente(server_fd);
 
+	recibirConexion(cliente_fd);
+
+	int cliente_fd2 = esperar_cliente(server_fd);
+	recibirConexion(cliente_fd2);
+
+	return EXIT_SUCCESS;
+}
+
+void iterator(char* value) {
+	log_info(logger,"%s", value);
+}
+
+void recibirConexion(int cliente_fd) {
+
 	t_list* lista;
 	while (1) {
 		int cod_op = recibir_operacion(cliente_fd);
@@ -21,15 +35,11 @@ int main(void) {
 			break;
 		case -1:
 			log_error(logger, "el cliente se desconecto. Terminando servidor");
-			return EXIT_FAILURE;
+			close(cliente_fd);
+			return;
 		default:
 			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
 			break;
 		}
 	}
-	return EXIT_SUCCESS;
-}
-
-void iterator(char* value) {
-	log_info(logger,"%s", value);
 }

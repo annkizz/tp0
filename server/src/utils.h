@@ -28,5 +28,6 @@ int esperar_cliente(int);
 t_list* recibir_paquete(int);
 void recibir_mensaje(int);
 int recibir_operacion(int);
+void conectarCLientes(int socketServidor);
 
 #endif /* UTILS_H_ */

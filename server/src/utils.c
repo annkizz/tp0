@@ -1,4 +1,4 @@
-#include"utils.h"
+#include "utils.h"
 
 t_log* logger;
 
@@ -31,6 +31,7 @@ int iniciar_servidor(void)
 
 	freeaddrinfo(servinfo);
 	log_trace(logger, "Listo para escuchar a mi cliente");
+
 
 	return socket_servidor;
 }
