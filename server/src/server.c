@@ -28,7 +28,12 @@ void recibirConexion(int cliente_fd) {
 		case MENSAJE:
 			recibir_mensaje(cliente_fd);
 			break;
-		case PAQUETE:
+		case PCB:
+    		t_pcb *proceso = recibir_paquetePCB(cliente_fd);
+    		log_info(logger, "Me llego el PCB - id: %d, estado: %d, prioridad: %d", proceso->id, proceso->estado, proceso->prioridad);
+    		free(proceso);
+    	break;
+		case PAQUETE: 
 			lista = recibir_paquete(cliente_fd);
 			log_info(logger, "Me llegaron los siguientes valores:\n");
 			list_iterate(lista, (void*) iterator);

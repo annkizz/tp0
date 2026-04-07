@@ -107,3 +107,99 @@ void liberar_conexion(int socket_cliente)
 {
 	close(socket_cliente);
 }
+
+t_pcb pcb_crear(uint32_t id, uint32_t estado, t_contexto contexto, int32_t prioridad) {
+    t_pcb proceso;
+	proceso.id = id;
+	proceso.estado = estado;
+	proceso.contexto = contexto;
+	proceso.prioridad = prioridad;
+    return proceso;
+}
+
+t_buffer2 *buffer_create(uint32_t size) {
+    t_buffer2 *buffer = malloc(sizeof(t_buffer2));
+    buffer->size = size;
+    buffer->offset = 0;
+    buffer->stream = malloc(size);
+    return buffer;
+}
+
+void buffer_destroy(t_buffer2 *buffer) {
+    free(buffer->stream);
+    free(buffer);
+}
+
+void buffer_add(t_buffer2 *buffer, void *data, uint32_t size) {
+    memcpy(buffer->stream + buffer->offset, data, size);
+    buffer->offset += size;
+}
+
+void buffer_read(t_buffer2 *buffer, void *data, uint32_t size) {
+    memcpy(data, buffer->stream + buffer->offset, size);
+    buffer->offset += size;
+}
+
+void buffer_add_uint32(t_buffer2 *buffer, uint32_t data) {
+    buffer_add(buffer, &data, sizeof(uint32_t));
+}
+
+uint32_t buffer_read_uint32(t_buffer2 *buffer) {
+    uint32_t data;
+    buffer_read(buffer, &data, sizeof(uint32_t));
+    return data;
+}
+
+void buffer_add_contexto(t_buffer2 *buffer, t_contexto data) {
+	buffer_add(buffer, &data, sizeof(t_contexto));
+}
+
+t_contexto buffer_read_contexto(t_buffer2 *buffer) {
+	t_contexto data;
+	buffer_read(buffer, &data, sizeof(t_contexto));
+	return data;
+}
+
+t_buffer2 *pcb_serializar(t_pcb *proceso) {
+    t_buffer2 *buffer = buffer_create(
+      sizeof(uint32_t) * 3 + 
+      sizeof(t_contexto)
+    );
+
+    buffer_add_uint32(buffer, proceso->id);
+    buffer_add_uint32(buffer, proceso->estado);
+	buffer_add_uint32(buffer,proceso->prioridad);
+    buffer_add_contexto(buffer, proceso->contexto);
+
+    return buffer;
+}
+
+t_pcb *proceso_deserializar(t_buffer2 *buffer) {
+    t_pcb *proceso = malloc(sizeof(t_pcb));
+
+    proceso->id = buffer_read_uint32(buffer);
+    proceso->estado = buffer_read_uint32 (buffer);
+	proceso->prioridad = buffer_read_uint32(buffer);
+	proceso->contexto = buffer_read_contexto(buffer);
+    return proceso;
+}
+
+void enviar_paquetePCB(t_pcb *proceso, int socket_cliente) {
+    t_buffer2 *buffer = pcb_serializar(proceso);
+
+    int cod_op = PCB;
+    int bytes = sizeof(int) * 2 + buffer->size;
+    void *a_enviar = malloc(bytes);
+    int offset = 0;
+
+    memcpy(a_enviar + offset, &cod_op, sizeof(int));
+    offset += sizeof(int);
+    memcpy(a_enviar + offset, &buffer->size, sizeof(int));
+    offset += sizeof(int);
+    memcpy(a_enviar + offset, buffer->stream, buffer->size);
+
+    send(socket_cliente, a_enviar, bytes, 0);
+
+    free(a_enviar);
+    buffer_destroy(buffer);
+}

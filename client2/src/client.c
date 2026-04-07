@@ -59,10 +59,25 @@ int main(void)
 	// Armamos y enviamos el paquete
 	paquete(conexion);
 
+	t_contexto contextouwu;
+	contextouwu.AX = 8;
+	contextouwu.BX = 3;
+	contextouwu.IP = 5;
+	contextouwu.CP = 7;
+	contextouwu.PSW = 9;
+
+	t_pcb proceso1 = pcb_crear(1,0,contextouwu,2);
+
+	t_buffer2 *buffer = malloc(sizeof(t_buffer2));
+
+	enviar_paquetePCB(&proceso1, conexion);
+	free(buffer);
 	terminar_programa(conexion, logger, config);
 
 	/*---------------------------------------------------PARTE 5-------------------------------------------------------------*/
+
 	// Proximamente
+	// serialicemos chavales 
 }
 
 t_log* iniciar_logger(void)
